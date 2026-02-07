@@ -9,9 +9,9 @@ class Ot < Formula
   desc "Unofficial command-line interface for Otter.ai"
   homepage "https://github.com/Garyguo2011/otter-cli"
   url "git@github.com:Garyguo2011/otter-cli.git",
-      tag: "v1.0.0",
+      tag: "v1.0.1",
       using: OtGitDownloadStrategy
-  version "1.0.0"
+  version "1.0.1"
   license "MIT"
   head "git@github.com:Garyguo2011/otter-cli.git",
        branch: "main",
