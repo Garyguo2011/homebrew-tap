@@ -1,39 +1,46 @@
+class MygemGitDownloadStrategy < GitDownloadStrategy
+  def submodules?
+    false
+  end
+end
+
 class Mygem < Formula
   desc "Command-line client for Google Gemini"
   homepage "https://github.com/Garyguo2011/mygem"
+  url "git@github.com:Garyguo2011/mygem.git",
+      tag: "v0.1.0",
+      using: MygemGitDownloadStrategy
   version "0.1.0"
+  head "git@github.com:Garyguo2011/mygem.git",
+       branch: "main",
+       using: MygemGitDownloadStrategy
 
-  on_macos do
-    on_arm do
-      url "https://github.com/Garyguo2011/mygem/releases/download/v0.1.0/mygem-0.1.0-darwin-arm64.tar.gz",
-          using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "0b62121dbd167a7d6e4abe4e2e8edce93374a24ef4b3890a59f1fbf464586e43"
-    end
-    on_intel do
-      url "https://github.com/Garyguo2011/mygem/releases/download/v0.1.0/mygem-0.1.0-darwin-amd64.tar.gz",
-          using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "bf4430bff6491b28f698ddae3f5072b88fee2c76b8f23bc9b170ace56a0334dd"
-    end
-  end
-
-  on_linux do
-    on_arm do
-      url "https://github.com/Garyguo2011/mygem/releases/download/v0.1.0/mygem-0.1.0-linux-arm64.tar.gz",
-          using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "6be7eb387e474fd9b1d4f5bcf5fecf5a655256fb5bf84ac13fbf5d4df442a7bd"
-    end
-    on_intel do
-      url "https://github.com/Garyguo2011/mygem/releases/download/v0.1.0/mygem-0.1.0-linux-amd64.tar.gz",
-          using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "787b616f89d396eba90f381852cf29a851aed6f1da6d6098336da1636c04fc1f"
-    end
-  end
+  depends_on "go" => :build
 
   def install
-    bin.install "mygem"
+    system "go", "mod", "download"
+
+    ldflags = %W[
+      -X github.com/garyguo/mygem/cmd.Version=#{version}
+      -X github.com/garyguo/mygem/cmd.Commit=#{Utils.git_head}
+      -X github.com/garyguo/mygem/cmd.Date=#{time.iso8601}
+    ]
+    system "go", "build", *std_go_args(ldflags:)
+  end
+
+  def caveats
+    <<~EOS
+      First-time setup:
+        mygem auth login    # Opens Chrome, log in to Google manually
+
+      Common commands:
+        mygem chat list --table   # List recent chats
+        mygem chat list --json    # JSON output
+        mygem auth status         # Check auth status
+    EOS
   end
 
   test do
-    assert_match "mygem", shell_output("#{bin}/mygem version")
+    assert_match version.to_s, shell_output("#{bin}/mygem version")
   end
 end
