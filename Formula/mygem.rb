@@ -8,9 +8,9 @@ class Mygem < Formula
   desc "Command-line client for Google Gemini"
   homepage "https://github.com/Garyguo2011/mygem"
   url "git@github.com:Garyguo2011/mygem.git",
-      tag: "v0.1.0",
+      tag: "v0.4.0",
       using: MygemGitDownloadStrategy
-  version "0.1.0"
+  version "0.4.0"
   head "git@github.com:Garyguo2011/mygem.git",
        branch: "main",
        using: MygemGitDownloadStrategy
